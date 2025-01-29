@@ -1,0 +1,62 @@
+/* Custom styles for the portfolio */
+
+/* General styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+/* Header styles */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* About section */
+#about {
+    padding: 2rem 0;
+}
+
+#about .display-4 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+#about .text-muted {
+    margin-bottom: 2rem;
+}
+
+/* Skills badges */
+.badge {
+    padding: 0.5rem 1rem;
+    margin: 0.2rem;
+    font-size: 0.9rem;
+}
+
+/* Project cards */
+.card {
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Contact form */
+.form-control {
+    border-radius: 0.25rem;
+    border: 1px solid #dee2e6;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}

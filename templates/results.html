@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Analysis Results</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Summary Statistics</h5>
+            {{ summary | safe }}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Data Visualization</h5>
+            <img src="{{ url_for('static', filename=img_path) }}" class="img-fluid" alt="Data Visualization">
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Download Report</h5>
+            <a href="{{ url_for('download_pdf', pdf_filename=pdf_filename) }}" class="btn btn-primary">Download PDF Report</a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary ml-2">Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
