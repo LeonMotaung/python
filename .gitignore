@@ -3,6 +3,7 @@ cat > .gitignore << EOL
 venv/
 env/
 ENV/
+venv
 # Python
 __pycache__/
 *.py[cod]
