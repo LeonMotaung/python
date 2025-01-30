@@ -1,0 +1,198 @@
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VizionAnalytics - Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .cyber-glow {
+            text-shadow: 0 0 10px #06b6d4;
+        }
+        .docs-card {
+            background: #1f2937;
+            border: 1px solid #0891b2;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .docs-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 border-b border-cyan-600">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <span class="text-2xl font-bold text-cyan-400 cyber-glow font-orbitron">VizionAnalytics</span>
+            <div class="space-x-4">
+                <a href="{{ url_for('index') }}" class="text-cyan-300 hover:text-cyan-100">Home
+                </a>
+                <a href="{{ url_for('documentation') }}" class="text-cyan-300 hover:text-cyan-100">Documentation</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('logout') }}" class="bg-cyan-600 hover:bg-cyan-500 px-3 py-1 rounded-md transition duration-300">
+                        Log Off
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="bg-cyan-600 hover:bg-cyan-500 px-3 py-1 rounded-md transition duration-300">
+                        Log In
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Documentation Content -->
+    <div class="container mx-auto px-4 py-12">
+        <h1 class="text-4xl md:text-6xl font-bold text-cyan-400 cyber-glow text-center mb-12">Documentation</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Getting Started Card -->
+            <div class="docs-card p-6">
+                <h2 class="text-2xl font-bold text-cyan-400 mb-4">🚀 Getting Started</h2>
+                <ul class="space-y-3 text-cyan-300">
+                    <li>1. Create an account or log in</li>
+                    <li>2. Upload your dataset (CSV/Excel)</li>
+                    <li>3. Explore automated analysis</li>
+                    <li>4. Generate detailed reports</li>
+                </ul>
+            </div>
+
+            <!-- Features Card -->
+            <div class="docs-card p-6">
+                <h2 class="text-2xl font-bold text-cyan-400 mb-4">💡 Key Features</h2>
+                <div class="space-y-3 text-cyan-300">
+                    <p class="flex items-center">
+                        <i class="fas fa-chart-bar mr-2"></i>
+                        Automated visualizations
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-file-pdf mr-2"></i>
+                        PDF report generation
+                    </p>
+                    <p class="flex items-center">
+                        <i class="fas fa-database mr-2"></i>
+                        Secure cloud storage
+                    </p>
+                </div>
+            </div>
+
+            <!-- Data Analysis Card -->
+            <div class="docs-card p-6">
+                <h2 class="text-2xl font-bold text-cyan-400 mb-4">📊 Data Analysis</h2>
+                <div class="text-cyan-300 space-y-2">
+                    <p>Supported file types:</p>
+                    <div class="flex space-x-2">
+                        <span class="px-2 py-1 bg-cyan-600 rounded">CSV</span>
+                        <span class="px-2 py-1 bg-cyan-600 rounded">XLS</span>
+                        <span class="px-2 py-1 bg-cyan-600 rounded">XLSX</span>
+                    </div>
+                    <p class="mt-3">Max file size: 16MB</p>
+                </div>
+            </div>
+
+            <!-- Visualization Types -->
+            <div class="docs-card p-6 md:col-span-2">
+                <h2 class="text-2xl font-bold text-cyan-400 mb-4">📈 Visualization Types</h2>
+                <div class="grid grid-cols-2 gap-4 text-cyan-300">
+                    <div class="flex items-center">
+                        <i class="fas fa-chart-area mr-2"></i>
+                        Histograms
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-box mr-2"></i>
+                        Box Plots
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-wave-square mr-2"></i>
+                        Density Plots
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-project-diagram mr-2"></i>
+                        Q-Q Plots
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Reference -->
+            <div class="docs-card p-6">
+                <h2 class="text-2xl font-bold text-cyan-400 mb-4">🔌 API Endpoints</h2>
+                <code class="block p-3 bg-gray-800 rounded text-cyan-300 text-sm">
+                    POST /upload<br>
+                    GET /download/{filename}<br>
+                    GET /file/{file_id}
+                </code>
+            </div>
+        </div>
+
+        <!-- Advanced Usage Section -->
+        <div class="mt-16 docs-card p-8">
+            <h2 class="text-3xl font-bold text-cyan-400 cyber-glow mb-6">🛠 Advanced Usage</h2>
+            <div class="space-y-6 text-cyan-300">
+                <div>
+                    <h3 class="text-xl font-bold mb-2">Statistical Analysis</h3>
+                    <p>Automatically generated statistics include:</p>
+                    <ul class="list-disc list-inside mt-2 pl-4">
+                        <li>Descriptive statistics (mean, std dev)</li>
+                        <li>Data distribution analysis</li>
+                        <li>Missing value detection</li>
+                        <li>Normality testing (Q-Q plots)</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-2">Report Customization</h3>
+                    <p>Customize PDF reports through:</p>
+                    <div class="mt-2 grid grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-palette mr-2"></i>
+                            Color schemes
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-pie mr-2"></i>
+                            Graph types
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-cyan-600 py-12 mt-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-cyan-400 cyber-glow font-orbitron">
+                        VizionAnalytics
+                    </h3>
+                    <p class="mt-2 text-cyan-300 text-sm">
+                        Powered by Flask & MongoDB
+                    </p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                        <i class="fab fa-github text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-cyan-600 pt-8 text-center">
+                <p class="text-cyan-300 text-sm">
+                    {{ now.year }} <span class="cyber-glow">VizionAnalytics Developed by ByteBurst Technologies Inc</span>. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+{% endblock %}

@@ -1,206 +1,325 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="space-y-6">
-    <!-- Upload Card -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="p-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Welcome {{ current_user.email }}!</h2>
-            <div class="prose max-w-none">
-                <p class="text-gray-600">Upload a CSV or Excel file for analysis. The generated report will include:</p>
-                <ul class="list-disc list-inside text-gray-600 space-y-2">
-                    <li>Summary statistics in a landscape-oriented table</li>
-                    <li>Four visualizations per page:
-                        <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
-                            <li>Histogram</li>
-                            <li>Box Plot</li>
-                            <li>Density Plot</li>
-                            <li>Q-Q Plot</li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-            <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" class="mt-6">
-                <div class="space-y-4">
-                    <div>
-                        <label for="file" class="block text-sm font-medium text-gray-700">Choose File:</label>
-                        <input type="file" class="mt-1 block w-full text-sm text-gray-500
-                            file:mr-4 file:py-2 file:px-4
-                            file:rounded-md file:border-0
-                            file:text-sm file:font-semibold
-                            file:bg-primary file:text-white
-                            hover:file:bg-blue-600
-                            cursor-pointer" 
-                            id="file" name="file" accept=".csv,.xls,.xlsx" required>
-                        <p class="mt-1 text-sm text-gray-500">Supported formats: CSV, XLS, XLSX</p>
-                    </div>
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
-                        <i class="fas fa-upload mr-2"></i> Upload and Analyze
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- User Files -->
-    {% if user_files %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Your Uploaded Files</h3>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Filename</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Upload Date</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for file in user_files %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ file.filename }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ file.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <div class="flex space-x-2">
-                                <a href="{{ url_for('get_file', file_id=file.file_id) }}" class="inline-flex items-center px-3 py-1 border border-transparent rounded-md text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
-                                    <i class="fas fa-download mr-1"></i> Download
-                                </a>
-                                <a href="{{ url_for('delete_file', file_id=file.file_id) }}" onclick="return confirm('Are you sure you want to delete this file?')" class="inline-flex items-center px-3 py-1 border border-transparent rounded-md text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
-                                    <i class="fas fa-trash mr-1"></i> Delete
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Summary Statistics -->
-    {% if summary_stats %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Summary Statistics</h3>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for key, value in summary_stats.items() %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ key }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ value }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Visualizations -->
-    {% if visualizations %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Visualizations</h3>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {% for viz in visualizations %}
-                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <div class="px-4 py-3 border-b border-gray-200">
-                        <h4 class="text-sm font-medium text-gray-800">{{ viz.title }}</h4>
-                    </div>
-                    <div class="p-4">
-                        <img src="{{ viz.path }}" class="w-full h-auto rounded-md cursor-pointer transform hover:scale-[1.02] transition-transform duration-200" 
-                             alt="{{ viz.title }}" data-toggle="modal" data-target="#imageModal" 
-                             data-title="{{ viz.title }}" data-src="{{ viz.path }}">
-                    </div>
-                </div>
-                {% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science Analytics Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        .cyber-glow {
+            text-shadow: 0 0 10px #06b6d4;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-gray-800 border-b border-cyan-600">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <span class="text-2xl font-bold text-cyan-400 cyber-glow">VizionAnalytics</span>
+            <div class="space-x-4">
+                <a href="{{ url_for('index') }}" class="text-cyan-300 hover:text-cyan-100">Home</a>
+                <a href="{{ url_for('documentation') }}" class="text-cyan-300 hover:text-cyan-100">Documentation</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('logout') }}" class="bg-cyan-600 hover:bg-cyan-500 px-3 py-1 rounded-md transition duration-300">
+                        Log Off
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="bg-cyan-600 hover:bg-cyan-500 px-3 py-1 rounded-md transition duration-300">
+                        Log In
+                    </a>
+                {% endif %}
             </div>
         </div>
-    </div>
-    {% endif %}
-
-    <!-- PDF Download -->
-    {% if pdf_path %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Download Report</h3>
+    </nav>
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-6xl font-bold text-cyan-400 mb-6 cyber-glow">
+                Transform Your Data into Insights
+            </h1>
+            <div class="relative rounded-xl overflow-hidden border border-cyan-600/30">
+                <img src="../static/images/main.jpg" 
+                     alt="Data Analytics" 
+                     class="w-full h-64 object-cover opacity-80">
+                <div class="absolute inset-0 bg-cyan-600/10"></div>
+            </div>
         </div>
-        <div class="p-6">
-            <a href="{{ url_for('download_pdf', filename=pdf_filename) }}" 
-               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
-                <i class="fas fa-download mr-2"></i> Download PDF Report
-            </a>
-        </div>
+    <!-- Add this under the Hero Section -->
+<!-- Mission Statement -->
+<section class="my-16 text-center">
+    <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-cyan-400 mb-6 cyber-glow">
+            🔮 Our Mission: Democratizing Data Science
+        </h2>
+        <p class="text-cyan-300 text-lg leading-relaxed">
+            Empower everyone from analysts to executives with AI-driven insights. 
+            Transform raw numbers into strategic assets through automated visualization, 
+            predictive analytics, and enterprise-grade security.
+        </p>
+        <button class="mt-8 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+            Get Started → 
+        </button>
     </div>
-    {% endif %}
-</div>
+</section>
 
-<!-- Image Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content bg-white rounded-lg shadow-xl overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <h5 class="text-lg font-semibold text-gray-800" id="imageModalLabel"></h5>
-                    <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none" data-dismiss="modal" aria-label="Close">
-                        <i class="fas fa-times"></i>
-                    </button>
+<!-- Live Demo Section -->
+<section class="my-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Visualization Showcase -->
+        <div class="cyber-border p-6 rounded-xl bg-gray-800/50">
+            <h3 class="text-2xl text-cyan-400 mb-4 cyber-glow">📊 Sample Visualizations</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="border border-cyan-600/30 p-2 rounded-lg">
+                    <img src="https://placehold.co/600x400/1e293b/06b6d4?text=Linear+Regression" 
+                         alt="Regression Analysis" 
+                         class="rounded-lg hover:scale-105 transition-transform">
+                </div>
+                <div class="border border-cyan-600/30 p-2 rounded-lg">
+                    <img src="https://placehold.co/600x400/1e293b/06b6d4?text=Box+Whisker" 
+                         alt="Distribution Analysis" 
+                         class="rounded-lg hover:scale-105 transition-transform">
+                </div>
+                <div class="border border-cyan-600/30 p-2 rounded-lg">
+                    <img src="https://placehold.co/600x400/1e293b/06b6d4?text=Cluster+Analysis" 
+                         alt="Clustering" 
+                         class="rounded-lg hover:scale-105 transition-transform">
+                </div>
+                <div class="border border-cyan-600/30 p-2 rounded-lg">
+                    <img src="https://placehold.co/600x400/1e293b/06b6d4?text=Time+Series" 
+                         alt="Trend Analysis" 
+                         class="rounded-lg hover:scale-105 transition-transform">
                 </div>
             </div>
-            <div class="p-6 text-center">
-                <img src="" class="max-w-full h-auto mx-auto" id="modalImage" alt="">
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="cyber-border p-6 rounded-xl bg-gray-800/50">
+            <h3 class="text-2xl text-cyan-400 mb-6 cyber-glow">⚡ Instant Insights</h3>
+            <div class="space-y-6">
+                <div class="p-4 border border-cyan-600/30 rounded-lg hover:bg-gray-700/20 transition-colors">
+                    <h4 class="text-cyan-300 mb-2">🔍 Sample Analysis</h4>
+                    <p class="text-cyan-400 text-sm">Try with demo data:</p>
+                    <div class="mt-4 grid grid-cols-3 gap-2">
+                        <button class="bg-cyan-600/30 hover:bg-cyan-500/20 text-cyan-300 py-2 px-4 rounded">
+                            Sales Data
+                        </button>
+                        <button class="bg-cyan-600/30 hover:bg-cyan-500/20 text-cyan-300 py-2 px-4 rounded">
+                            Healthcare
+                        </button>
+                        <button class="bg-cyan-600/30 hover:bg-cyan-500/20 text-cyan-300 py-2 px-4 rounded">
+                            Financial
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-4 border border-cyan-600/30 rounded-lg">
+                    <h4 class="text-cyan-300 mb-2">📈 Real-time Stats</h4>
+                    <div class="space-y-2 text-cyan-400">
+                        <div class="flex justify-between">
+                            <span>Data Processed:</span>
+                            <span>2.1PB</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Models Trained:</span>
+                            <span>1.4M+</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<style>
-.modal-backdrop.show {
-    @apply bg-black bg-opacity-75 backdrop-blur-sm;
-}
+<!-- Features Grid -->
+<section class="my-16">
+    <h2 class="text-3xl text-cyan-400 text-center mb-12 cyber-glow">✨ Core Features</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="feature-card p-6 border border-cyan-600/30 rounded-xl hover:border-cyan-400 transition-colors">
+            <div class="text-cyan-400 text-4xl mb-4">🤖</div>
+            <h3 class="text-xl text-cyan-300 mb-2">AI-Powered Analysis</h3>
+            <p class="text-cyan-400">Automated machine learning models for predictive insights</p>
+        </div>
+        <div class="feature-card p-6 border border-cyan-600/30 rounded-xl hover:border-cyan-400 transition-colors">
+            <div class="text-cyan-400 text-4xl mb-4">🛡️</div>
+            <h3 class="text-xl text-cyan-300 mb-2">Military-Grade Security</h3>
+            <p class="text-cyan-400">End-to-end encryption & GDPR compliance</p>
+        </div>
+        <div class="feature-card p-6 border border-cyan-600/30 rounded-xl hover:border-cyan-400 transition-colors">
+            <div class="text-cyan-400 text-4xl mb-4">📑</div>
+            <h3 class="text-xl text-cyan-300 mb-2">Smart Reporting</h3>
+            <p class="text-cyan-400">Automated PDF generation with dynamic visuals</p>
+        </div>
+    </div>
+</section>
 
-.modal-dialog {
-    @apply max-w-4xl mx-auto mt-16;
-}
+<!-- Tech Specs Section -->
+<section class="my-16 cyber-border p-8 rounded-xl bg-gray-800/50">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+            <h3 class="text-2xl text-cyan-400 mb-4 cyber-glow">🖥️ Technical Architecture</h3>
+            <div class="space-y-4 text-cyan-300">
+                <div class="flex items-center">
+                    <div class="w-8 mr-3 text-cyan-400">
+                        <i class="fab fa-python"></i>
+                    </div>
+                    <span>Flask-powered backend with async processing</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-8 mr-3 text-cyan-400">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <span>MongoDB Atlas cloud storage</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-8 mr-3 text-cyan-400">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <span>JWT authentication & RBAC</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3 class="text-2xl text-cyan-400 mb-4 cyber-glow">🔗 API Endpoints</h3>
+            <div class="space-y-2">
+                <code class="block p-3 bg-gray-900 rounded text-cyan-300 text-sm">
+                    POST /api/v1/analyze
+                </code>
+                <code class="block p-3 bg-gray-900 rounded text-cyan-300 text-sm">
+                    GET /api/v1/datasets/{id}
+                </code>
+                <code class="block p-3 bg-gray-900 rounded text-cyan-300 text-sm">
+                    WS /api/v1/realtime
+                </code>
+            </div>
+        </div>
+    </div>
+</section>
 
-.modal.fade .modal-dialog {
-    @apply transform transition-transform duration-300 ease-out;
-}
+<!-- Testimonials Section -->
+<section class="my-16">
+    <h2 class="text-3xl text-cyan-400 text-center mb-12 cyber-glow">🌟 User Stories</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="testimonial-card p-6 border border-cyan-600/30 rounded-xl">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cyan-400/10 rounded-full mr-4"></div>
+                <div>
+                    <h4 class="text-cyan-300">Data Science Team Lead</h4>
+                    <p class="text-cyan-400 text-sm">Fortune 500 Company</p>
+                </div>
+            </div>
+            <p class="text-cyan-300 italic">"Reduced our EDA time by 70% while improving model accuracy through automated feature engineering."</p>
+        </div>
+        <div class="testimonial-card p-6 border border-cyan-600/30 rounded-xl">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-cyan-400/10 rounded-full mr-4"></div>
+                <div>
+                    <h4 class="text-cyan-300">Startup Founder</h4>
+                    <p class="text-cyan-400 text-sm">AI Healthcare Startup</p>
+                </div>
+            </div>
+            <p class="text-cyan-300 italic">"The automated reporting helped us secure $2M in funding by clearly visualizing our data story."</p>
+        </div>
+    </div>
+</section>
 
-.modal.fade.show .modal-dialog {
-    @apply translate-y-0;
-}
-</style>
+<!-- FAQ Section -->
+<section class="my-16">
+    <h2 class="text-3xl text-cyan-400 text-center mb-12 cyber-glow">❔ Frequently Asked Questions</h2>
+    <div class="max-w-3xl mx-auto space-y-4">
+        <div class="faq-item border-b border-cyan-600/30 pb-4">
+            <button class="flex justify-between items-center w-full text-cyan-300 hover:text-cyan-200">
+                <span>What file formats do you support?</span>
+                <i class="fas fa-chevron-down ml-2"></i>
+            </button>
+            <p class="mt-2 text-cyan-400 hidden">We currently support CSV, Excel, and JSON formats with 16MB file size limit.</p>
+        </div>
+        <div class="faq-item border-b border-cyan-600/30 pb-4">
+            <button class="flex justify-between items-center w-full text-cyan-300 hover:text-cyan-200">
+                <span>How is my data protected?</span>
+                <i class="fas fa-chevron-down ml-2"></i>
+            </button>
+            <p class="mt-2 text-cyan-400 hidden">All data is encrypted at rest and in transit using AES-256, with optional on-premise deployment.</p>
+        </div>
+    </div>
+</section>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    $('#imageModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var title = button.data('title');
-        var src = button.data('src');
+<!-- CTA Section -->
+<section class="my-16 text-center">
+    <div class="cyber-border p-12 rounded-xl bg-gradient-to-r from-cyan-600/10 to-blue-600/10">
+        <h2 class="text-3xl text-cyan-400 mb-6 cyber-glow">Ready to Transform Your Data?</h2>
+        <div class="flex justify-center gap-4">
+            <button class="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-3 rounded-lg transition duration-300">
+                Start Free Trial
+            </button>
+            <button class="border border-cyan-500 text-cyan-300 hover:bg-cyan-500/10 px-8 py-3 rounded-lg transition duration-300">
+                Schedule Demo
+            </button>
+        </div>
+    </div>
+</section>
+
         
-        var modal = $(this);
-        modal.find('#imageModalLabel').text(title);
-        modal.find('#modalImage').attr('src', src);
-    });
-    
-    $('#imageModal').on('hidden.bs.modal', function () {
-        var modal = $(this);
-        modal.find('#imageModalLabel').text('');
-        modal.find('#modalImage').attr('src', '');
-    });
-});
-</script>
-{% endblock content %}
+    <!-- Sponsors Section -->
+    <div class="bg-gray-800 border-t border-cyan-600/30 py-12">
+        <div class="container mx-auto px-4 text-center">
+            <h4 class="text-cyan-300 mb-8">Trusted By Leading Organizations</h4>
+            <div class="flex flex-wrap justify-center gap-8">
+                <img src="https://placehold.co/150x60?text=Tech+Corp" alt="Sponsor" class="h-12 opacity-80 hover:opacity-100 transition-opacity">
+                <img src="https://placehold.co/150x60?text=Data+Works" alt="Sponsor" class="h-12 opacity-80 hover:opacity-100 transition-opacity">
+                <img src="https://placehold.co/150x60?text=AI+Solutions" alt="Sponsor" class="h-12 opacity-80 hover:opacity-100 transition-opacity">
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize Bootstrap components
+        document.addEventListener('DOMContentLoaded', function() {
+            // Example initialization for tooltips or other components
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
+<footer class="bg-gray-800 border-t border-cyan-600 py-12">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+            <div class="text-center md:text-left">
+                <h3 class="text-2xl font-bold text-cyan-400 cyber-glow font-orbitron">
+                    VizionAnalytics
+                </h3>
+                <p class="mt-2 text-cyan-300 text-sm">
+                    Powered by Flask & MongoDB
+                </p>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                    <i class="fab fa-github text-2xl"></i>
+                </a>
+                <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                    <i class="fab fa-linkedin text-2xl"></i>
+                </a>
+                <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                    <i class="fab fa-twitter text-2xl"></i>
+                </a>
+            </div>
+        </div>
+        <div class="mt-8 border-t border-cyan-600 pt-8 text-center">
+            <p class="text-cyan-300 text-sm">
+                {{ now.year }} <span class="cyber-glow">VizionAnalytics</span>. All rights reserved.
+            </p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

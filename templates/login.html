@@ -1,62 +1,92 @@
-{% extends "base.html" %}
 {% block content %}
-<div class="min-h-[80vh] flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-8">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">Welcome Back</h2>
-            <p class="text-gray-600 mt-2">Please sign in to your account</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science Analytics Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        .cyber-glow {
+            text-shadow: 0 0 10px #06b6d4;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-gray-800 border-b border-cyan-600">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <span class="text-2xl font-bold text-cyan-400 cyber-glow">VizionAnalytics</span>
+            <div class="space-x-4">
+                <a href="{{ url_for('index') }}" class="text-cyan-300 hover:text-cyan-100">Home</a>
+                <a href="{{ url_for('documentation') }}" class="text-cyan-300 hover:text-cyan-100">Documentation</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('logout') }}" class="bg-cyan-600 hover:bg-cyan-500 px-3 py-1 rounded-md transition duration-300">
+                        Log Off
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="bg-cyan-600 hover:bg-cyan-500 px-3 py-1 rounded-md transition duration-300">
+                        Log In
+                    </a>
+                {% endif %}
+            </div>
         </div>
-
-        <form method="POST" action="" class="space-y-6">
-            {{ form.hidden_tag() }}
-            
+    </nav>
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl md:text-6xl font-bold text-cyan-400 mb-6 cyber-glow text-center">Login</h1>
+        <form action="{{ url_for('login') }}" method="post" class="space-y-6">
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                <div class="mt-1">
-                    {{ form.email(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm", placeholder="Enter your email") }}
-                </div>
-                {% if form.email.errors %}
-                    {% for error in form.email.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+                <label for="email" class="block text-cyan-300 mb-2">Email:</label>
+                <input type="email" name="email" id="email" required class="block w-full rounded-lg border-gray-300 bg-gray-700 text-cyan-300">
             </div>
-
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <div class="mt-1">
-                    {{ form.password(class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm", placeholder="Enter your password") }}
-                </div>
-                {% if form.password.errors %}
-                    {% for error in form.password.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+                <label for="password" class="block text-cyan-300 mb-2">Password:</label>
+                <input type="password" name="password" id="password" required class="block w-full rounded-lg border-gray-300 bg-gray-700 text-cyan-300">
             </div>
-
-            <div>
-                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
-                    Sign In
-                </button>
-            </div>
+            <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded">Login</button>
         </form>
+    </div>
 
-        <div class="mt-6">
-            <div class="relative">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-300"></div>
+    <footer class="bg-gray-800 border-t border-cyan-600 py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-cyan-400 cyber-glow font-orbitron">
+                        VizionAnalytics
+                    </h3>
+                    <p class="mt-2 text-cyan-300 text-sm">
+                        Powered by Flask & MongoDB
+                    </p>
                 </div>
-                <div class="relative flex justify-center text-sm">
-                    <span class="px-2 bg-white text-gray-500">Don't have an account?</span>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                        <i class="fab fa-github text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                        <i class="fab fa-linkedin text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-cyan-400 hover:text-cyan-300 transition duration-300">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
                 </div>
             </div>
-
-            <div class="mt-6">
-                <a href="{{ url_for('signup') }}" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
-                    Create New Account
-                </a>
+            <div class="mt-8 border-t border-cyan-600 pt-8 text-center">
+                <p class="text-cyan-300 text-sm">
+                    {{ now.year }} <span class="cyber-glow">VizionAnalytics</span>. All rights reserved.
+                </p>
             </div>
         </div>
-    </div>
-</div>
+    </footer>
+    
+</body>
+</html>
 {% endblock %}

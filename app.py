@@ -18,12 +18,20 @@ import time
 import shutil
 import numpy as np
 from io import BytesIO
+from datetime import datetime
+
+
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+from datetime import datetime
 
+@app.route('/')
+def index_v2():
+    now = datetime.now()
+    return render_template('index.html', now=now)
 # Configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///app.db')
@@ -331,6 +339,18 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
+
+@app.route('/signup')
+def signup_v2():
+    now = datetime.now()
+    return render_template('signup.html', now=now)
+
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now()}
+@app.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
